@@ -14,17 +14,12 @@ function calculateWinner(squares){
     [2, 4, 6],
   ];
 
-  console.log("squares", squares);
   for (let i = 0; i < lines.length; i++){
     const [a, b, c] = lines[i];
 
     const squaresA = squares[a] ? squares[a].simbol : null;
     const squaresB = squares[b] ? squares[b].simbol : null;
     const squaresC = squares[c] ? squares[c].simbol : null;
-
-    console.log("squaresA", squaresA);
-    console.log("squaresB", squaresB);
-    console.log("squaresC", squaresC);
 
     if(squaresA && squaresA === squaresB && squaresA === squaresC){
       return squaresA;
@@ -135,7 +130,11 @@ class Game extends React.Component {
         'Go to game start';
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          { move === this.state.stepNumber ? (
+            <button onClick={() => this.jumpTo(move)}><b>{ desc }</b></button>
+          ) : (
+            <button onClick={() => this.jumpTo(move)}>{ desc }</button>
+          )}
         </li>
       );
     });
