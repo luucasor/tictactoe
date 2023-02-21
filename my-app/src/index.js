@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 
+//TODO Corrigir estrutura do squares para o método calculateWinner voltar a funcionar
 function calculateWinner(squares){
   const lines = [
     [0, 1, 2],
@@ -34,7 +35,7 @@ class Board extends React.Component {
   renderSquare(i) {
     return (
       <Square 
-        value={this.props.squares[i]} 
+        value={this.props.squares[i] ? this.props.squares[i].simbol : null} 
         onClick={() => this.props.onClick(i)}
       />
     );
@@ -81,7 +82,21 @@ class Game extends React.Component {
     if(calculateWinner(squares) || squares[i]){
       return;
     }
-    squares[i] = this.state.xIsNext ? 'X' : 'O';
+
+    const lines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8]
+    ];
+
+    let line = lines.find(item => item.includes(i));
+
+    squares[i] = {
+        simbol: this.state.xIsNext ? 'X' : 'O',
+        col: line ? line.indexOf(i) + 1 : null,
+        lin: line ? lines.indexOf(line) + 1 : null,
+        mov: this.state.stepNumber + 1
+    };
     this.setState({
       history: history.concat([{
         squares: squares,
@@ -101,11 +116,36 @@ class Game extends React.Component {
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
+
+    console.log("history", history);
+    console.log("current", current);
     const winner = calculateWinner(current.squares);
 
     const moves = history.map((step, move) => {
+      // let line = lines.find(item => item.includes(current.moves.squareNumber));
+      // const colIndex = line ? line.indexOf(current.squareNumber) + 1 : null;
+      // const linIndex = line ? lines.indexOf(line) + 1 : null;
+      // const simbol = current.simbol;
+
+      // array1.forEach((item, i) => {
+      //   var same = array2[i] === item;
+      //   if(!same){
+      //       diff = {
+      //           simbol: array2[i],
+      //           index: i
+      //       }
+      //       return;
+      //   }
+      // });
+
+
+      console.log("step", step);
+      console.log("move", move);
+      // console.log("stepMove", step.squares[move]);
+
+      const currentMove = step.squares.find(x => x && x.mov === move);
       const desc = move ? 
-        'Go to move #' + move :
+        `Go to move # ${move} - ${(currentMove ? currentMove.simbol : '')} Col: ${currentMove.col} Lin: ${currentMove.lin}`:
         'Go to game start';
       return (
         <li key={move}>
