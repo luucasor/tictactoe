@@ -30,42 +30,37 @@ function calculateWinner(squares){
 
 function Square(props) {
     return (
-      <button className="square" onClick={props.onClick}>
+      <button className="square" onClick={props.onClick} reference={props.reference}>
         {props.value}
       </button>
     );
 }
 
 class Board extends React.Component {
-  renderSquare(i) {
+  renderSquare(i, col) {
     return (
       <Square 
         value={this.props.squares[i] ? this.props.squares[i].simbol : null} 
         onClick={() => this.props.onClick(i)}
+        key={i}
+        reference={ "col-"+(col+1) }
       />
     );
   }
 
   render() {
-    return (
-      <div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
-      </div>
-    );
+    let board = [];
+    let counter = 0;
+
+    for(var i = 0; i < this.props.squareNumbers.length; i++){
+      let rows = [];
+      for(var ii = 0; ii < this.props.squareNumbers[i].length; ii++){
+        rows.push(this.renderSquare(counter, ii));
+        counter++;
+      }
+      board.push(React.createElement('div', { className: "board-row", key: "row-"+i, reference:"row-"+(i+1) }, rows));
+    }
+    return board;
   }
 }
 
@@ -88,18 +83,11 @@ class Game extends React.Component {
       return;
     }
 
-    const lines = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8]
-    ];
-
-    let line = lines.find(item => item.includes(i));
-
+    let line = this.props.squareNumbers.find(item => item.includes(i));
     squares[i] = {
         simbol: this.state.xIsNext ? 'X' : 'O',
         col: line ? line.indexOf(i) + 1 : null,
-        lin: line ? lines.indexOf(line) + 1 : null,
+        lin: line ? this.props.squareNumbers.indexOf(line) + 1 : null,
         mov: this.state.stepNumber + 1
     };
     this.setState({
@@ -152,6 +140,7 @@ class Game extends React.Component {
           <Board 
             squares={current.squares}
             onClick={(i) => this.handleClick(i)}
+            squareNumbers={this.props.squareNumbers}
           />
         </div>
         <div className="game-info">
@@ -166,5 +155,10 @@ class Game extends React.Component {
 // ========================================
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<Game />);
+const squareNumbers = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8]
+];
+root.render(<Game squareNumbers={squareNumbers}/>);
 
