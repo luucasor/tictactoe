@@ -64,6 +64,12 @@ class Board extends React.Component {
   }
 }
 
+class Sorting extends React.Component {
+  render() {
+     return <button onClick={() => this.props.onClick()}>Sorting: { this.props.ascending ? "DESC" : "ASC" }</button>
+  };
+}
+
 class Game extends React.Component {
   constructor(props){
     super(props);
@@ -73,6 +79,7 @@ class Game extends React.Component {
       }], 
       stepNumber: 0,
       xIsNext: true,
+      ascending: true
     };
   }
   handleClick(i) {
@@ -106,6 +113,12 @@ class Game extends React.Component {
     });
   }
 
+  handleSortClick(){
+    this.setState({
+      ascending: !this.state.ascending
+    });
+  }
+
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
@@ -127,6 +140,10 @@ class Game extends React.Component {
       );
     });
 
+    if(!this.state.ascending){
+      moves.reverse();
+    }
+
     let status;
     if(winner){
       status = 'Winner: ' + winner;
@@ -146,6 +163,7 @@ class Game extends React.Component {
         <div className="game-info">
           <div>{status}</div>
           <ol>{moves}</ol>
+          <Sorting ascending={ this.state.ascending } onClick={()=> this.handleSortClick()}/>
         </div>
       </div>
     );
