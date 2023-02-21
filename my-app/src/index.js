@@ -22,7 +22,10 @@ function calculateWinner(squares){
     const squaresC = squares[c] ? squares[c].simbol : null;
 
     if(squaresA && squaresA === squaresB && squaresA === squaresC){
-      return squaresA;
+      return {
+        simbol: squaresA,
+        moves: [squares[a], squares[b], squares[c]]
+      };
     }  
   }
   return null;
@@ -30,20 +33,22 @@ function calculateWinner(squares){
 
 function Square(props) {
     return (
-      <button className="square" onClick={props.onClick} reference={props.reference}>
+      <button className={ props.winner ? "square winner-square" : "square"} onClick={props.onClick} reference={props.reference}>
         {props.value}
       </button>
     );
 }
 
 class Board extends React.Component {
-  renderSquare(i, col) {
+  renderSquare(counter, col) {
+    const winner = this.props.winnerNumbers && this.props.winnerNumbers.find(item => item === counter) >= 0 ? true : false;
     return (
       <Square 
-        value={this.props.squares[i] ? this.props.squares[i].simbol : null} 
-        onClick={() => this.props.onClick(i)}
-        key={i}
+        value={this.props.squares[counter] ? this.props.squares[counter].simbol : null} 
+        onClick={() => this.props.onClick(counter)}
+        key={counter}
         reference={ "col-"+(col+1) }
+        winner={ winner }
       />
     );
   }
@@ -95,7 +100,8 @@ class Game extends React.Component {
         simbol: this.state.xIsNext ? 'X' : 'O',
         col: line ? line.indexOf(i) + 1 : null,
         lin: line ? this.props.squareNumbers.indexOf(line) + 1 : null,
-        mov: this.state.stepNumber + 1
+        mov: this.state.stepNumber + 1,
+        squareNumber: i
     };
     this.setState({
       history: history.concat([{
@@ -123,6 +129,9 @@ class Game extends React.Component {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
+    const winnerNumbers = winner ? winner.moves.map(item => {
+      return item.squareNumber;
+    }) : null;
 
     const moves = history.map((step, move) => {
       const currentMove = step.squares.find(x => x && x.mov === move);
@@ -146,7 +155,7 @@ class Game extends React.Component {
 
     let status;
     if(winner){
-      status = 'Winner: ' + winner;
+      status = 'Winner: ' + winner.simbol;
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }
@@ -155,9 +164,10 @@ class Game extends React.Component {
       <div className="game">
         <div className="game-board">
           <Board 
-            squares={current.squares}
-            onClick={(i) => this.handleClick(i)}
-            squareNumbers={this.props.squareNumbers}
+            squares={ current.squares }
+            onClick={ (i) => this.handleClick(i) }
+            squareNumbers={ this.props.squareNumbers }
+            winnerNumbers={ winnerNumbers }
           />
         </div>
         <div className="game-info">
