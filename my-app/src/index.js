@@ -154,10 +154,14 @@ class Game extends React.Component {
     }
 
     let status;
+    let nobodyWon;
     if(winner){
       status = 'Winner: ' + winner.simbol;
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+      if(history.length >= 10 && winnerNumbers == null){
+        nobodyWon = '!!! Nobody won !!!';
+      }
     }
 
     return (
@@ -172,6 +176,7 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
+          <div>{nobodyWon}</div>
           <ol>{moves}</ol>
           <Sorting ascending={ this.state.ascending } onClick={()=> this.handleSortClick()}/>
         </div>
